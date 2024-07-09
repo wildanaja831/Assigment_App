@@ -1,0 +1,22 @@
+SOAL NO 1
+
+SELECT u.name, SUM(o.amount) AS total
+FROM users u 
+JOIN orders o ON u.id = o.user_id 
+WHERE o.created_at >= '2022-01-01'
+GROUP BY u.name 
+HAVING SUM(o.amount) >= 100 ;
+
+SOAL NO 2
+
+// Membuat penghubung antar database (Hanya di jalankan di database First)
+CREATE EXTENSION dblink;
+
+SELECT u.name, SUM(o.amount) as total, MAX(o.created_at) as last_orders
+FROM users u 
+JOIN dblink('dbname=second user=postgres password=Wildanaja', 
+			'SELECT user_id, amount, created_at FROM orders') 
+AS o(user_id INT, amount NUMERIC(10,2), created_at TIMESTAMP)
+ON u.id = o.user_id 
+GROUP BY u.name
+ORDER BY u.name;
